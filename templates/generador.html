@@ -226,6 +226,34 @@
       </div>
     </div>
   </section>
+
+  <!-- Sección de datos de prueba precompilados -->
+  <section class="mt-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h5 class="card-title mb-2">¿Solo necesitas datos de prueba rápidos?</h5>
+        <p class="mb-2">
+          Si únicamente requieres un conjunto de datos de ejemplo para probar el
+          simulador de forma sencilla y rápida, puedes descargar un archivo 
+          <strong>precompilado</strong> sin necesidad de configurar el generador.
+        </p>
+        <p class="mb-2">
+          Este archivo ya incluye la estructura esperada por el simulador 
+          (<code>fecha_radicacion</code>, <code>aplicativo</code>,
+          <code>numero_factura</code>, <code>valor_factura</code>,
+          <code>cantidad_lineas</code>, entre otras columnas) y está listo
+          para ser cargado directamente en la sección de simulación.
+        </p>
+        <a
+          href="{{ url_for('static', path='data/DatosPrueba.csv') }}"
+          class="btn btn-outline-secondary"
+          download
+        >
+          Descargar datos de prueba (DatosPrueba.csv)
+        </a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <!-- Script para manejar submit con fetch, mostrar punticos y reactivar al final -->
