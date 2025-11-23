@@ -1,0 +1,44 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+.env/
+.env.*
+
+# Archivos de configuración locales / secretos
+*.env
+*.ini
+*.cfg
+
+# Archivos de logs
+*.log
+
+# Cachés de herramientas
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Render / despliegue
+*.sqlite3
+
+# Datos locales grandes (opcional)
+# Si no quieres subir datasets de prueba al repo, descomenta:
+# data/
+# *.csv
+# dataset_*.csv

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Resultados de la Simulación</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1100px;
+        margin: 20px auto;
+        padding: 0 10px;
+      }
+      h1, h2, h3 {
+        color: #333;
+      }
+
+      /* Menú tipo barra (tabs) */
+      .tab-menu {
+        display: flex;
+        background: #1565c0; /* azul */
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 15px 0;
+      }
+      .tab-menu .tab {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        color: #e3f2fd;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .tab-menu .tab:not(.active):hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .tab-menu .tab.active {
+        background: #e3f2fd;
+        color: #0d47a1;
+      }
+
+      .filter-bar {
+        margin-top: 5px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .filter-bar label {
+        font-weight: bold;
+      }
+      .filter-bar select {
+        padding: 4px 8px;
+      }
+
+      .app-block {
+        margin-top: 10px;
+        margin-bottom: 30px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+      }
+      .app-title {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      .columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      .card {
+        flex: 1 1 300px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 10px 12px;
+      }
+      .card h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
+      table.kv {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      table.kv th,
+      table.kv td {
+        border: 1px solid #ddd;
+        padding: 6px 8px;
+        font-size: 14px;
+      }
+      table.kv th {
+        background-color: #f5f5f5;
+        text-align: left;
+        width: 55%;
+      }
+      table.kv td {
+        text-align: right;
+      }
+      a.button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 16px;
+        border-radius: 4px;
+        background-color: #1976d2;
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      a.button:hover {
+        background-color: #145ca2;
+      }
+
+      .conclusion-block {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 10px 12px;
+        border-left: 4px solid #1565c0;
+        background: #e3f2fd;
+        border-radius: 4px;
+      }
+
+      .raw-table {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Resultados de la Simulación</h1>
+    <p>
+      Proyección para el año <strong>{{ anio_proyeccion }}</strong>.
+    </p>
+
+    {% if not results_anual or results_anual|length == 0 %}
+      <p>No se obtuvieron resultados.</p>
+      <p><a href="/form" class="button">Volver al formulario</a></p>
+    {% else %}
+
+      <!-- Menú azul Interno / Externo / Ambos -->
+      <div class="tab-menu">
+        <button class="tab active" data-mode="Interno">Interno</button>
+        <button class="tab" data-mode="Externo">Externo</button>
+        <button class="tab" data-mode="Ambos">Ambos</button>
+      </div>
+
+      <!-- Selector de mes -->
+      <div class="filter-bar">
+        <label for="month-filter">Mes:</label>
+        <select id="month-filter">
+          <option value="1">Enero</option>
+          <option value="2">Febrero</option>
+          <option value="3">Marzo</option>
+          <option value="4">Abril</option>
+          <option value="5">Mayo</option>
+          <option value="6">Junio</option>
+          <option value="7">Julio</option>
+          <option value="8">Agosto</option>
+          <option value="9">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
+        </select>
+      </div>
+
+      <!-- BLOQUE INTERNO -->
+      <div class="app-block" id="block-interno">
+        <div class="app-title">Interno</div>
+        <div class="columns">
+          <!-- Columna IZQUIERDA: Anual Interno -->
+          <div class="card">
+            <h3>Resumen anual</h3>
+            <table class="kv">
+              <tbody>
+                <tr>
+                  <th>Facturas/año</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Interno' %}
+                        {{ "{:,.0f}".format(row.facturas_anuales or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Facturación/año</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Interno' %}
+                        ${{ "{:,.0f}".format(row.facturacion_anual or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Horas promedio por factura</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Interno' %}
+                        {{ "{:,.2f}".format(row.horas_por_factura or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Horas/mes (promedio)</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Interno' %}
+                        {{ "{:,.0f}".format(row.total_horas_mes_promedio or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Colaboradores/mes (promedio)</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Interno' %}
+                        {{ "{:,.0f}".format(row.colaboradores_necesarios_mes or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Colaboradores pico anual</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Interno' %}
+                        {{ "{:,.0f}".format(row.colaboradores_pico_anual or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Columna DERECHA: Mensual Interno (mes seleccionado) -->
+          <div class="card">
+            <h3>
+              Resumen mensual – <span id="interno-mes-label">Enero</span>
+            </h3>
+            <table class="kv">
+              <tbody>
+                <tr>
+                  <th>Facturas/mes</th>
+                  <td><span id="interno-facturas-mes">–</span></td>
+                </tr>
+                <tr>
+                  <th>Facturación/mes</th>
+                  <td><span id="interno-facturacion-mes">–</span></td>
+                </tr>
+                <tr>
+                  <th>Horas totales/mes</th>
+                  <td><span id="interno-horas-mes">–</span></td>
+                </tr>
+                <tr>
+                  <th>Colaboradores/mes</th>
+                  <td><span id="interno-colabs-mes">–</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOQUE EXTERNO -->
+      <div class="app-block" id="block-externo">
+        <div class="app-title">Externo</div>
+        <div class="columns">
+          <!-- Columna IZQUIERDA: Anual Externo -->
+          <div class="card">
+            <h3>Resumen anual</h3>
+            <table class="kv">
+              <tbody>
+                <tr>
+                  <th>Facturas/año</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Externo' %}
+                        {{ "{:,.0f}".format(row.facturas_anuales or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Facturación/año</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Externo' %}
+                        ${{ "{:,.0f}".format(row.facturacion_anual or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Horas promedio por factura</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Externo' %}
+                        {{ "{:,.2f}".format(row.horas_por_factura or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Horas/mes (promedio)</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Externo' %}
+                        {{ "{:,.0f}".format(row.total_horas_mes_promedio or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Colaboradores/mes (promedio)</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Externo' %}
+                        {{ "{:,.0f}".format(row.colaboradores_necesarios_mes or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Colaboradores pico anual</th>
+                  <td>
+                    {% for row in results_anual %}
+                      {% if row.aplicativo == 'Externo' %}
+                        {{ "{:,.0f}".format(row.colaboradores_pico_anual or 0) }}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Columna DERECHA: Mensual Externo (mes seleccionado) -->
+          <div class="card">
+            <h3>
+              Resumen mensual – <span id="externo-mes-label">Enero</span>
+            </h3>
+            <table class="kv">
+              <tbody>
+                <tr>
+                  <th>Facturas/mes</th>
+                  <td><span id="externo-facturas-mes">–</span></td>
+                </tr>
+                <tr>
+                  <th>Facturación/mes</th>
+                  <td><span id="externo-facturacion-mes">–</span></td>
+                </tr>
+                <tr>
+                  <th>Horas totales/mes</th>
+                  <td><span id="externo-horas-mes">–</span></td>
+                </tr>
+                <tr>
+                  <th>Colaboradores/mes</th>
+                  <td><span id="externo-colabs-mes">–</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {# === CONCLUSIONES BASADAS DIRECTO EN results_anual === #}
+      {% set interno_list = results_anual | selectattr("aplicativo", "equalto", "Interno") | list %}
+      {% set externo_list = results_anual | selectattr("aplicativo", "equalto", "Externo") | list %}
+      {% set interno = interno_list[0] if interno_list|length > 0 else None %}
+      {% set externo = externo_list[0] if externo_list|length > 0 else None %}
+
+      {% set int_pico = interno.colaboradores_pico_anual if interno is not none else 0 %}
+      {% set int_prom = interno.colaboradores_necesarios_mes if interno is not none else 0 %}
+      {% set ext_pico = externo.colaboradores_pico_anual if externo is not none else 0 %}
+      {% set ext_prom = externo.colaboradores_necesarios_mes if externo is not none else 0 %}
+
+      {% set total_pico = int_pico + ext_pico %}
+      {% set total_prom = int_prom + ext_prom %}
+
+      <div class="conclusion-block" id="conclusion-interno">
+        <strong>Conclusión:</strong>
+        Para el aplicativo <strong>Interno</strong> se requieren aproximadamente
+        <strong>{{ "{:,.0f}".format(int_pico) }}</strong>
+        colaboradores en el <strong>pico anual</strong> y, en promedio,
+        <strong>{{ "{:,.1f}".format(int_prom) }}</strong>
+        colaboradores <strong>por mes</strong>.
+      </div>
+
+      <div class="conclusion-block" id="conclusion-externo">
+        <strong>Conclusión:</strong>
+        Para el aplicativo <strong>Externo</strong> se requieren aproximadamente
+        <strong>{{ "{:,.0f}".format(ext_pico) }}</strong>
+        colaboradores en el <strong>pico anual</strong> y, en promedio,
+        <strong>{{ "{:,.1f}".format(ext_prom) }}</strong>
+        colaboradores <strong>por mes</strong>.
+      </div>
+
+      <div class="conclusion-block" id="conclusion-ambos">
+        <strong>Conclusión:</strong>
+        Considerando ambas modalidades, se requieren aproximadamente
+        <strong>{{ "{:,.0f}".format(int_pico) }}</strong> colaboradores
+        <strong>Internos</strong> y
+        <strong>{{ "{:,.0f}".format(ext_pico) }}</strong> colaboradores
+        <strong>Externos</strong> en el <strong>pico anual</strong>, para un total de
+        <strong>{{ "{:,.0f}".format(total_pico) }}</strong>
+        colaboradores.
+        Además, en promedio se requieren
+        <strong>{{ "{:,.1f}".format(int_prom) }}</strong> colaboradores
+        <strong>Internos</strong> y
+        <strong>{{ "{:,.1f}".format(ext_prom) }}</strong> colaboradores
+        <strong>Externos</strong> por mes, para un total promedio de
+        <strong>{{ "{:,.1f}".format(total_prom) }}</strong>
+        colaboradores mensuales.
+      </div>
+
+      <p>
+        <a href="/form" class="button">Volver al formulario</a>
+      </p>
+
+      <!-- Tablas ocultas con datos mensuales para JS -->
+      <table id="raw-mensual-interno" class="raw-table">
+        <tbody>
+          {% for row in results_mensual %}
+            {% if row.aplicativo == 'Interno' %}
+              <tr
+                data-mes="{{ row.mes }}"
+                data-facturas="{{ row.facturas_mes or 0 }}"
+                data-facturacion="{{ row.facturacion_mes or 0 }}"
+                data-horas="{{ row.horas_totales_mes or 0 }}"
+                data-colabs="{{ row.colaboradores_necesarios_mes or 0 }}"
+              ></tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <table id="raw-mensual-externo" class="raw-table">
+        <tbody>
+          {% for row in results_mensual %}
+            {% if row.aplicativo == 'Externo' %}
+              <tr
+                data-mes="{{ row.mes }}"
+                data-facturas="{{ row.facturas_mes or 0 }}"
+                data-facturacion="{{ row.facturacion_mes or 0 }}"
+                data-horas="{{ row.horas_totales_mes or 0 }}"
+                data-colabs="{{ row.colaboradores_necesarios_mes or 0 }}"
+              ></tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const tabs = document.querySelectorAll(".tab-menu .tab");
+          const blockInterno = document.getElementById("block-interno");
+          const blockExterno = document.getElementById("block-externo");
+
+          const conclInterno = document.getElementById("conclusion-interno");
+          const conclExterno = document.getElementById("conclusion-externo");
+          const conclAmbos = document.getElementById("conclusion-ambos");
+
+          const monthSelect = document.getElementById("month-filter");
+
+          // spans visibles para Interno
+          const internoMesLabel = document.getElementById("interno-mes-label");
+          const internoFacturasSpan = document.getElementById("interno-facturas-mes");
+          const internoFacturacionSpan = document.getElementById("interno-facturacion-mes");
+          const internoHorasSpan = document.getElementById("interno-horas-mes");
+          const internoColabsSpan = document.getElementById("interno-colabs-mes");
+
+          // spans visibles para Externo
+          const externoMesLabel = document.getElementById("externo-mes-label");
+          const externoFacturasSpan = document.getElementById("externo-facturas-mes");
+          const externoFacturacionSpan = document.getElementById("externo-facturacion-mes");
+          const externoHorasSpan = document.getElementById("externo-horas-mes");
+          const externoColabsSpan = document.getElementById("externo-colabs-mes");
+
+          // tablas ocultas
+          const rawInterno = document.getElementById("raw-mensual-interno");
+          const rawExterno = document.getElementById("raw-mensual-externo");
+
+          const monthNames = {
+            1: "Enero",
+            2: "Febrero",
+            3: "Marzo",
+            4: "Abril",
+            5: "Mayo",
+            6: "Junio",
+            7: "Julio",
+            8: "Agosto",
+            9: "Septiembre",
+            10: "Octubre",
+            11: "Noviembre",
+            12: "Diciembre",
+          };
+
+          const formatNumber = (value, decimals = 0, prefix = "", suffix = "") => {
+            const num = Number(value) || 0;
+            return (
+              prefix +
+              num.toLocaleString("es-CO", {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals,
+              }) +
+              suffix
+            );
+          };
+
+          const updateMonthlyCard = (mes) => {
+            const mesInt = parseInt(mes, 10);
+
+            // Interno
+            if (rawInterno) {
+              const rowI = rawInterno.querySelector(`tr[data-mes="${mesInt}"]`);
+              if (rowI) {
+                internoMesLabel.textContent = monthNames[mesInt] || `Mes ${mesInt}`;
+                internoFacturasSpan.textContent = formatNumber(rowI.dataset.facturas, 0);
+                internoFacturacionSpan.textContent = formatNumber(rowI.dataset.facturacion, 0, "$");
+                internoHorasSpan.textContent = formatNumber(rowI.dataset.horas, 1);
+                internoColabsSpan.textContent = formatNumber(rowI.dataset.colabs, 0);
+              } else {
+                internoMesLabel.textContent = monthNames[mesInt] || `Mes ${mesInt}`;
+                internoFacturasSpan.textContent = "–";
+                internoFacturacionSpan.textContent = "–";
+                internoHorasSpan.textContent = "–";
+                internoColabsSpan.textContent = "–";
+              }
+            }
+
+            // Externo
+            if (rawExterno) {
+              const rowE = rawExterno.querySelector(`tr[data-mes="${mesInt}"]`);
+              if (rowE) {
+                externoMesLabel.textContent = monthNames[mesInt] || `Mes ${mesInt}`;
+                externoFacturasSpan.textContent = formatNumber(rowE.dataset.facturas, 0);
+                externoFacturacionSpan.textContent = formatNumber(rowE.dataset.facturacion, 0, "$");
+                externoHorasSpan.textContent = formatNumber(rowE.dataset.horas, 1);
+                externoColabsSpan.textContent = formatNumber(rowE.dataset.colabs, 0);
+              } else {
+                externoMesLabel.textContent = monthNames[mesInt] || `Mes ${mesInt}`;
+                externoFacturasSpan.textContent = "–";
+                externoFacturacionSpan.textContent = "–";
+                externoHorasSpan.textContent = "–";
+                externoColabsSpan.textContent = "–";
+              }
+            }
+          };
+
+          const setMode = (mode) => {
+            // actualizar tabs
+            tabs.forEach((t) => t.classList.remove("active"));
+            tabs.forEach((t) => {
+              if (t.dataset.mode === mode) {
+                t.classList.add("active");
+              }
+            });
+
+            if (mode === "Interno") {
+              blockInterno.style.display = "";
+              blockExterno.style.display = "none";
+
+              conclInterno.style.display = "";
+              conclExterno.style.display = "none";
+              conclAmbos.style.display = "none";
+            } else if (mode === "Externo") {
+              blockInterno.style.display = "none";
+              blockExterno.style.display = "";
+
+              conclInterno.style.display = "none";
+              conclExterno.style.display = "";
+              conclAmbos.style.display = "none";
+            } else {
+              // Ambos
+              blockInterno.style.display = "";
+              blockExterno.style.display = "";
+
+              conclInterno.style.display = "none";
+              conclExterno.style.display = "none";
+              conclAmbos.style.display = "";
+            }
+          };
+
+          tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+              setMode(tab.dataset.mode);
+            });
+          });
+
+          if (monthSelect) {
+            monthSelect.addEventListener("change", () => {
+              updateMonthlyCard(monthSelect.value);
+            });
+          }
+
+          // Estado inicial: Interno + mes 1 (Enero)
+          setMode("Interno");
+          if (monthSelect) {
+            updateMonthlyCard(monthSelect.value);
+          }
+        });
+      </script>
+
+    {% endif %}
+  </body>
+</html>
