@@ -1,0 +1,306 @@
+{% include 'header.html' %}
+
+<main class="container py-4">
+  <!-- Título e introducción -->
+  <section class="mb-4 generator-intro">
+    <div class="row">
+      <div class="col-lg-8">
+        <h2 class="h3 mb-3">Generador de datos sintéticos de facturación</h2>
+        <p class="lead mb-2">
+          Esta sección permite crear un archivo <strong>CSV sintético</strong> con la
+          misma estructura que el histórico real de facturación, pero sin
+          utilizar datos sensibles de la institución.
+        </p>
+        <p class="mb-0">
+          El generador respeta la lógica del proceso (distribución de prestadores,
+          tipos de factura, complejidad medida en líneas, crecimiento anual en
+          facturas y facturación) para producir un conjunto de datos
+          <strong>realista y reproducible</strong>, ideal para pruebas del
+          simulador, docencia y validación de escenarios.
+        </p>
+      </div>
+      <div class="col-lg-4 mt-3 mt-lg-0">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-2">¿Qué obtendrás?</h5>
+            <ul class="mb-0">
+              <li>Un archivo <code>.csv</code> listo para usar en el simulador.</li>
+              <li>Columnas como: <code>anio</code>, <code>id_prestador</code>,
+                <code>nombre_prestador</code>, <code>numero_factura</code>,
+                <code>fecha_radicacion</code>, <code>valor_factura</code>,
+                <code>aplicativo</code>, <code>tipo_factura</code>,
+                <code>cantidad_lineas</code>.
+              </li>
+              <li>Datos generados con una semilla aleatoria configurable
+                (resultados replicables).
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Formulario de parámetros -->
+  <section>
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Configurar generación de datos</h5>
+
+        <form action="/generador" method="post" class="row g-3">
+          <!-- Rango de años -->
+          <div class="col-md-3">
+            <label class="form-label fw-semibold" for="anio_inicio">
+              Año inicial
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="anio_inicio"
+              name="anio_inicio"
+              value="{{ anio_inicio_default }}"
+              required
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label fw-semibold" for="anio_fin">
+              Año final
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="anio_fin"
+              name="anio_fin"
+              value="{{ anio_fin_default }}"
+              required
+            />
+          </div>
+
+          <!-- Nombre del archivo -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold" for="filename">
+              Nombre del archivo (sin extensión)
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="filename"
+              name="filename"
+              value="{{ filename_default if filename_default is defined else 'DatosPrueba' }}"
+              required
+            />
+            <div class="form-text">
+              Se descargará como <code>NombreArchivo.csv</code>. Por defecto:
+              <code>DatosPrueba.csv</code>.
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <div class="alert alert-light border small mb-0">
+              El generador creará datos para todos los años entre
+              <strong>inicio</strong> y <strong>fin</strong>, ambos incluidos.
+            </div>
+          </div>
+
+          <!-- Totales iniciales -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="total_facturas_inicial">
+              Total de facturas (año inicial)
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="total_facturas_inicial"
+              name="total_facturas_inicial"
+              value="{{ total_facturas_default }}"
+              min="1"
+              required
+            />
+            <div class="form-text">
+              Número aproximado de facturas en el primer año simulado.
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="total_facturacion_inicial">
+              Facturación total (año inicial)
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="total_facturacion_inicial"
+              name="total_facturacion_inicial"
+              value="{{ total_facturacion_default }}"
+              min="1"
+              required
+            />
+            <div class="form-text">
+              Valor total facturado en el primer año (en pesos).
+            </div>
+          </div>
+
+          <!-- Prestadores -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="total_prestadores">
+              Número total de prestadores
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="total_prestadores"
+              name="total_prestadores"
+              value="{{ total_prestadores_default }}"
+              min="1"
+              required
+            />
+            <div class="form-text">
+              Cada prestador tendrá un identificador y un peso de facturación.
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="total_prestadores_solo_interno">
+              Prestadores solo internos
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="total_prestadores_solo_interno"
+              name="total_prestadores_solo_interno"
+              value="{{ total_prestadores_solo_interno_default }}"
+              min="0"
+              required
+            />
+            <div class="form-text">
+              Prestadores que solo facturan como <code>Interno</code>.
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold" for="seed">
+              Semilla aleatoria
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="seed"
+              name="seed"
+              value="{{ seed_default }}"
+              required
+            />
+            <div class="form-text">
+              Cambia la semilla para obtener un dataset distinto manteniendo
+              la misma configuración.
+            </div>
+          </div>
+
+          <!-- Nota y botón -->
+          <div class="col-12 d-flex justify-content-between align-items-center mt-3">
+            <small class="text-muted">
+              Al hacer clic en <strong>Generar CSV</strong>, se descargará un
+              archivo con los datos sintéticos generados según los parámetros
+              configurados.
+            </small>
+            <button type="submit" class="btn btn-primary">
+              Generar CSV
+            </button>
+          </div>
+        </form>
+
+        <!-- Bloque de carga (inicialmente oculto) -->
+        <div id="generador-loading" class="mt-3" style="display: none;">
+          <div class="alert alert-info d-flex align-items-center py-2 mb-2" role="alert">
+            <div class="me-2 fw-semibold">Generando CSV</div>
+            <div class="loading-dots" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <p class="small text-muted mb-0">
+            Este proceso puede tardar algunos segundos según el tamaño del dataset.  
+            Por favor no cierres ni recargues la ventana.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Script para manejar submit con fetch, mostrar punticos y reactivar al final -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector('form[action="/generador"]');
+    if (!form) return;
+
+    const loadingBlock = document.getElementById("generador-loading");
+    const submitButton = form.querySelector('button[type="submit"]');
+    const filenameInput = document.getElementById("filename");
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault(); // Evita enviar el formulario de forma tradicional
+
+      // Mostrar bloque con los tres punticos
+      if (loadingBlock) {
+        loadingBlock.style.display = "block";
+      }
+
+      // Desactivar botón y cambiar texto
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerText = "Generando...";
+      }
+
+      try {
+        const formData = new FormData(form);
+
+        // Llamar al endpoint /generador con fetch
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al generar el CSV");
+        }
+
+        // Recibir el CSV como blob
+        const blob = await response.blob();
+
+        // Nombre del archivo
+        let name = (filenameInput?.value || "DatosPrueba").trim();
+        if (!name) {
+          name = "DatosPrueba";
+        }
+        if (!name.toLowerCase().endsWith(".csv")) {
+          name = name + ".csv";
+        }
+
+        // Crear un enlace temporal para descargar el archivo
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error(err);
+        alert("Ocurrió un error generando el archivo. Intenta de nuevo.");
+      } finally {
+        // Ocultar bloque de carga y reactivar el botón
+        if (loadingBlock) {
+          loadingBlock.style.display = "none";
+        }
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.innerText = "Generar CSV";
+        }
+      }
+    });
+  });
+</script>
+
+{% include 'footer.html' %}

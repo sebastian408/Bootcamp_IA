@@ -1,0 +1,253 @@
+{% include 'header.html' %}
+
+<main class="container py-4">
+  <!-- HERO INTRODUCTORIO -->
+  <section class="mb-4">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h2 class="h3 mb-3">
+          Bienvenido al Simulador de Capacidad Operativa
+        </h2>
+        <p class="lead">
+          Esta herramienta fue desarrollada para responder una pregunta simple,
+          pero crítica en la operación diaria: 
+          <strong>¿con el histórico de facturación que tenemos, cuántos
+          colaboradores necesitamos para atender la carga de trabajo futura?</strong>
+        </p>
+        <p class="mb-3">
+          A partir de los datos de facturación (volumen de facturas, valor
+          facturado, complejidad de las cuentas, distribución entre procesos
+          internos y externos, etc.), el simulador proyecta escenarios y estima
+          el número de colaboradores requeridos, diferenciando entre trabajo
+          interno y tercerizado.
+        </p>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <a href="/form" class="btn btn-primary">
+            Iniciar simulación
+          </a>
+          <a href="/generador" class="btn btn-outline-secondary">
+            Generar datos de prueba
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title mb-2">¿Qué necesitas para empezar?</h5>
+            <ul class="mb-0">
+              <li>Un archivo CSV con el histórico de facturación.</li>
+              <li>
+                Columnas básicas como 
+                <code>fecha_radicacion</code>,
+                <code>aplicativo</code>,
+                <code>numero_factura</code>,
+                <code>valor_factura</code> y
+                <code>cantidad_lineas</code>.
+              </li>
+              <li>
+                Supuestos de crecimiento (facturas y facturación) y parámetros
+                operativos (horas/día, días/mes, porcentajes interno/externo).
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JUSTIFICACIÓN DEL PROYECTO -->
+  <section class="mb-5">
+    <h3 class="h4 mb-3">¿Por qué un proyecto de este tipo?</h3>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title">De la intuición a los datos</h5>
+            <p class="card-text">
+              En muchas áreas asistenciales, administrativas y de facturación,
+              la planeación de personal se hace con base en la experiencia
+              individual y “sensaciones” de carga, más que en
+              <strong>evidencia cuantitativa</strong>. 
+              Este simulador busca transformar esos criterios subjetivos en
+              estimaciones reproducibles, verificables y trazables.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title">Uso eficiente de recursos</h5>
+            <p class="card-text">
+              Contar con un modelo que relacione el histórico de facturación,
+              la complejidad de las cuentas y la productividad esperada permite
+              <strong>ajustar la capacidad operativa</strong>: evitar
+              sobrecontratación, reducir el riesgo de subdimensionar equipos y
+              justificar de forma técnica la necesidad de nuevos cargos o
+              servicios tercerizados.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENERADOR DE DATOS -->
+  <section class="mb-5">
+    <h3 class="h4 mb-3">¿Para qué sirve el generador de datos?</h3>
+    <div class="row g-3">
+      <div class="col-md-7">
+        <p>
+          El módulo de <strong>generador de datos</strong> permite crear
+          conjuntos de datos sintéticos con la misma estructura que el
+          histórico real. Esto es especialmente útil cuando:
+        </p>
+        <ul>
+          <li>No se dispone todavía de un histórico completo o depurado.</li>
+          <li>Se quiere <strong>probar el simulador</strong> sin exponer datos sensibles.</li>
+          <li>
+            Se requieren <strong>escenarios controlados</strong> para docencia,
+            validación del modelo o demostraciones técnicas.
+          </li>
+        </ul>
+        <p class="mb-0">
+          Estos datos sintéticos respetan la lógica del proceso: meses con
+          mayor volumen, diferencias entre aplicativos internos y externos,
+          variaciones en el número de líneas por factura y en el valor
+          facturado, de forma que las simulaciones generadas sean
+          representativas de un caso realista.
+        </p>
+      </div>
+
+      <div class="col-md-5">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title">¿Por qué son importantes estos datos?</h5>
+            <p class="card-text">
+              La calidad de las proyecciones depende directamente de la calidad
+              del insumo. Un buen conjunto de datos (real o sintético) permite:
+            </p>
+            <ul class="mb-0">
+              <li>Detectar estacionalidad y tendencias en la facturación.</li>
+              <li>Cuantificar la carga de trabajo asociada a cada aplicativo.</li>
+              <li>
+                Ajustar parámetros del simulador antes de usarlo en producción.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA EL SIMULADOR -->
+  <section class="mb-5">
+    <h3 class="h4 mb-3">¿Cómo funciona el simulador?</h3>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h6 class="text-muted">Paso 1</h6>
+            <h5 class="card-title">Carga del histórico</h5>
+            <p class="card-text">
+              El usuario sube un archivo CSV con el histórico de facturación
+              (fechas, aplicativos, número de facturas, valores y complejidad
+              medida como cantidad de líneas u otro indicador).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h6 class="text-muted">Paso 2</h6>
+            <h5 class="card-title">Análisis histórico</h5>
+            <p class="card-text">
+              El sistema calcula promedios y tendencias mensuales por
+              aplicativo, identifica comportamiento estacional y resume el
+              volumen de trabajo típico en términos de facturas, valor y
+              complejidad.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h6 class="text-muted">Paso 3</h6>
+            <h5 class="card-title">Proyección del escenario</h5>
+            <p class="card-text">
+              Con base en los porcentajes de crecimiento definidos por el
+              usuario, el simulador proyecta la facturación para el año de
+              interés y separa el trabajo en interno y externo según los
+              porcentajes configurados.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h6 class="text-muted">Paso 4</h6>
+            <h5 class="card-title">Estimación de colaboradores</h5>
+            <p class="card-text">
+              Finalmente, se convierte la carga de trabajo proyectada en horas
+              requeridas y se estima el número de colaboradores necesarios por
+              mes y el pico anual, diferenciando entre personal interno y
+              externo, además del total combinado.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POSIBLES APLICACIONES -->
+  <section class="mb-4">
+    <h3 class="h4 mb-3">Posibles aplicaciones</h3>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <ul>
+          <li>
+            <strong>Planeación de capacidad de RRHH:</strong> estimar el número
+            de colaboradores requeridos para soportar el crecimiento esperado.
+          </li>
+          <li>
+            <strong>Negociación con proveedores externos:</strong> proyectar
+            cuánta carga se podría tercerizar y cuál debería mantenerse interna.
+          </li>
+          <li>
+            <strong>Soporte a decisiones financieras:</strong> vincular la
+            facturación proyectada con los costos de personal y servicios
+            contratados.
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <ul>
+          <li>
+            <strong>Justificación de nuevos cargos:</strong> respaldar
+            solicitudes de ampliación de planta con indicadores objetivos.
+          </li>
+          <li>
+            <strong>Docencia y formación:</strong> usar el simulador como caso
+            de estudio en cursos de gestión de operaciones, analítica de datos
+            o administración de servicios de salud.
+          </li>
+          <li>
+            <strong>Evaluación de escenarios:</strong> probar distintos
+            supuestos de crecimiento y productividad para analizar su impacto
+            en la capacidad requerida.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+{% include 'footer.html' %}
